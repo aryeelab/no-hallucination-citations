@@ -7,3 +7,10 @@ node_modules/
 
 # macOS
 .DS_Store
+
+# Derived benchmark/run artifacts
+runs/
+runs_archived_*/
+reports/
+rubrics/
+eval_report_*.md
