@@ -27,6 +27,8 @@ Autoresearch-style project for optimizing biomedical literature-search skill pro
 
 The lead agent orchestrates the loop, delegates runs and evals to `vanilla` agents, synthesizes results, and writes modified prompts.
 
+Delegate only one benchmark task or one evaluator task to each `vanilla` subagent. Do not bundle multiple benchmark tasks in one call. Ask the subagent to return a brief final status when done.
+
 ### Autoresearch Loop
 
 Each iteration `vN` follows this order: **write prompt → run benchmark → evaluate → summarize**.
