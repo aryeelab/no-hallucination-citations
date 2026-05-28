@@ -6,7 +6,7 @@ Construct a minimal prompt that avoids hallucinated citations, invented metadata
 
 ## Current Status
 
-v2 complete (v0–v2 run).
+Final prompt selected: **v10**. Saved as `skill_final.md`.
 
 | v | BRCA | TF | Total | Key failure modes |
 |---|------|----|------|-------------------------------|
@@ -14,8 +14,22 @@ v2 complete (v0–v2 run).
 | v1 | 46 | 83 | 129 | PMID 40242782 hallucinated, YY1 claim unsupported by abstract |
 | v2 | 49 | 84 | 133 | author misattribution (Qin vs Quinn), Matrin3 paper misframed as YY1 study |
 
+### Latest benchmark/autoresearch result
+
+The v0–v14 autoresearch loop in `runs/` identified **v10** as the best score-preserving compact prompt:
+
+| Iteration | Prompt chars | Prompt words | p53 | non-CTCF loops | Total / 200 |
+|---|---:|---:|---:|---:|---:|
+| v10 | 1,030 | 139 | 99 | 88 | 187 |
+| v11 | 828 | 106 | 94 | 86 | 180 |
+| v12 | 770 | 94 | 50 | 31 | 81 |
+| v13 | 1,222 | 168 | 85 | 78 | 163 |
+| v14 | 1,151 | 153 | 85 | 71 | 156 |
+
+v10 is preferred over v11 because the small extra length retains explicit anti-hallucination wording: “Do not infer, paraphrase, invent, or fill missing metadata” and “do not present [weaker evidence types] as direct mechanistic proof.”
+
 ## Pending / Next Actions
-- [ ] Write v3 prompt to address persistent author misattribution and abstract overstretching, then run v3–v9
+- [x] Select final compact prompt (`skill_final.md`, copied from `runs/v10/skill.md`)
 
 ## Notes and Procedure
 
@@ -35,8 +49,14 @@ Each iteration `vN` follows this order: **write prompt → run benchmark → eva
 
 1. **Write the prompt.** For `v0`, copy the seed from `./skill_v0.md` to `runs/v0/skill.md`. For `vN>0`, write a new prompt addressing the previous iteration's failure modes. Save as `runs/vN/skill.md`. Experiment freely with the new skill text, but do not explicitly put a hard cap on the number of citations to be returned. 
 2. **Identify the next version.** If `runs/` doesn't exist, start at `v0`. Otherwise, find the highest version with a `skill.md` but no complete `summary.md`, or the next increment if all existing versions are complete.
-3. **Run the benchmark.** Execute every task in `evals/tasks/`. Use each file's basename (without extension) as `<task_id>`. Create `runs/vN/<task_id>/` and save runner output in `output.md`.
+3. **Run the benchmark.** Execute every task in `evals/tasks/`. Use the task file's declared `Task ID` as `<task_id>` when present; otherwise use the file basename converted to underscores. Create `runs/vN/<task_id>/` and save runner output in `runs/vN/<task_id>/output.md`.
+   - The lead must tell each runner subagent the exact absolute output path.
+   - The runner subagent must write the final answer to that exact file path and return only a brief completion status plus the path written.
+   - If a runner writes anywhere else, treat the run as incomplete until the output is moved or re-run into the correct path.
 4. **Evaluate using `vanilla` agents.** Pass each evaluator: the full rubric, the runner `output.md`, the original task prompt, PubMed MCP access, and instruction to produce the evaluator report format from the rubric. Save reports in `runs/vN/<task_id>/report.md`. Do not proceed until all evaluations are complete.
+   - The lead must tell each evaluator subagent the exact absolute report path.
+   - The evaluator subagent must write the final report to that exact file path and return only a brief completion status plus the path written.
+   - If an evaluator writes anywhere else, treat the evaluation as incomplete until the report is moved or re-run into the correct path.
 5. **Summarize.** Save `runs/vN/summary.md` with: each task score, total score, failure modes identified, and prompt changes made for the next iteration.
 6. Run 10 benchmark iterations: `v0` through `v9`. 
 7. Do not stop early. Keep trying new ideas until you hit the iteration max.
@@ -47,6 +67,8 @@ Each iteration `vN` follows this order: **write prompt → run benchmark → eva
 Delegate a runner task to a `vanilla` agent with this input:
 - The skill prompt from `runs/vN/skill.md`
 - The task prompt from the corresponding `evals/tasks/` file
+- The exact absolute output path: `.../runs/vN/<task_id>/output.md`
+- Instruction to save the complete runner answer to that exact path and not to save it elsewhere
 - No other instructions. The goal is to assess if the skill.md is enough to generate good output.
 
 Runner `vanilla` agents may use PubMed MCP tools if the candidate `skill.md` instructs them to do so. Do not add extra verification instructions outside the candidate skill prompt.
@@ -59,6 +81,8 @@ Delegate an eval task to a `vanilla` agent with this input:
 - The original task prompt
 - PubMed MCP server access
 - Instruction: evaluate the runner output using the rubric, verify every cited paper via PubMed, and produce the evaluation report in the "Expected Evaluator Report Format" shown in the rubric.
+- The exact absolute report path: `.../runs/vN/<task_id>/report.md`
+- Instruction to save the complete evaluator report to that exact path and not to save it elsewhere.
 
 ---
 
