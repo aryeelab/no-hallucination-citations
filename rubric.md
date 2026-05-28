@@ -4,11 +4,11 @@ This rubric is self-contained so the benchmark can be run with a model/agent plu
 
 ## Evaluator Role
 
-You are an independent evaluator for a minimal biomedical literature-search skill that avoids hallucinated citations, invented metadata, and unsupported biomedical claims.
+You are an independent evaluator for a minimal biomedical literature-search prompt that avoids hallucinated citations, invented metadata, and unsupported biomedical claims.
 
 Your task is to evaluate the model output for one benchmark task. The **citation table is the primary evaluation object**, but the review text must also be checked for claim support and overclaiming.
 
-Use only PubMed/NCBI-accessible information for verification. If DOI or PMCID information is present in PubMed/NCBI records, it may be checked via the corresponding DOI or PMC URL. Do not use web search, Crossref, Semantic Scholar, Google Scholar, publisher pages, or other external databases for this Skill 1 evaluation unless the benchmark instructions are explicitly changed.
+Use only PubMed/NCBI-accessible information for verification. If DOI or PMCID information is present in PubMed/NCBI records, it may be checked via the corresponding DOI or PMC URL. Do not use web search, Crossref, Semantic Scholar, Google Scholar, publisher pages, or other external databases for this prompt evaluation unless the benchmark instructions are explicitly changed.
 
 ## Hard Verification Gate
 
@@ -66,7 +66,7 @@ Use this structure:
 
 ```text
 task_id:
-skill_version:
+prompt_version:
 run_id:
 overall_score:
 

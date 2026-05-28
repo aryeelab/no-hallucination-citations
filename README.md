@@ -1,17 +1,23 @@
 # No-Hallucination-Citations
 
-This is a Karpathy-style autoresearch project for optimizing a biomedical literature-search skill prompts. The current best skill is in `skill.md`. To reset the project for a fresh autoresearch loop, delete the entire `runs/` directory.
+This is a [Karpathy-inspired autoresearch](https://github.com/karpathy/autoresearch) project for improving an agent's ability to do a biomedical literature search without hallucinations. The current best prompt is in [`prompt.md`](./prompt.md). To reset the project for a fresh run, delete the `runs/` directory (if it exists) and tell the agent to start the autoresearch loop.
 
-## Goal
+## Using the no-hallucination-citations prompt
 
-Construct a minimal prompt that avoids hallucinated citations, invented metadata, and unsupported biomedical claims in biomedical literature-search answers. Correctness is more important than completeness: it is acceptable to omit marginal or uncertain papers, but not to fabricate, misidentify, or overclaim citations.
+Tell your agent to do this:
+**"Fetch [https://raw.githubusercontent.com/aryeelab/no-hallucination-citations/main/prompt.md](https://raw.githubusercontent.com/aryeelab/no-hallucination-citations/main/prompt.md) and append its contents to your agent instructions file (e.g. `AGENTS.md`, `CLAUDE.md`).**
 
+(Or do this manually)
+
+## How the prompt was derived
 ### Autoresearch Loop
+
+**Goal**: Start with the long, detailed citation instructions in [`prompt_v0`](prompt_v0.md) and iteratively improve them to find a prompt that is 1) short and 2) avoids hallucinated citations, invented metadata, and unsupported claims. The autoresearch loop tests the current prompt version on the literature search tasks in [`evals`](./evals) and then scores the result using a rubric (see below). 
 
 Each iteration `vN` follows this order: **write prompt → run benchmark → evaluate → summarize**.
 
-1. **Write the prompt.** For `v0`, copy the seed from `./skill_v0.md` to `runs/v0/skill.md`. For `vN>0`, write a new prompt addressing the previous iteration's failure modes. Save as `runs/vN/skill.md`. Experiment freely with the new skill text to maximize the score while minimizing prompt length. Do not explicitly put a hard cap on the number of citations to be returned. 
-2. **Identify the next version.** If `runs/` doesn't exist, start at `v0`. Otherwise, find the highest version with a `skill.md` but no complete `summary.md`, or the next increment if all existing versions are complete.
+1. **Write the prompt.** For `v0`, copy the seed from `./prompt_v0.md` to `runs/v0/prompt.md`. For `vN>0`, write a new prompt addressing the previous iteration's failure modes. Save as `runs/vN/prompt.md`. Experiment freely with the new prompt text to maximize the score while minimizing prompt length. Do not explicitly put a hard cap on the number of citations to be returned. 
+2. **Identify the next version.** If `runs/` doesn't exist, start at `v0`. Otherwise, find the highest version with a `prompt.md` but no complete `summary.md`, or the next increment if all existing versions are complete.
 3. **Run the benchmark.** Execute every task in `evals/tasks/`. Use the task file's declared `Task ID` as `<task_id>` when present; otherwise use the file basename converted to underscores. Create `runs/vN/<task_id>/` and save runner output in `runs/vN/<task_id>/output.md`.
    - The lead must tell each runner subagent the exact absolute output path.
    - The runner subagent must write the final answer to that exact file path and return only a brief completion status plus the path written.
@@ -27,13 +33,13 @@ Each iteration `vN` follows this order: **write prompt → run benchmark → eva
 ### Runner prompt spec
 
 Delegate a runner task to an agent with this input:
-- The skill prompt from `runs/vN/skill.md`
+- The candidate prompt from `runs/vN/prompt.md`
 - The task prompt from the corresponding `evals/tasks/` file
 - The exact absolute output path: `.../runs/vN/<task_id>/output.md`
 - Instruction to save the complete runner answer to that exact path and not to save it elsewhere
-- No other instructions. The goal is to assess if the skill.md is enough to generate good output.
+- No other instructions. The goal is to assess if the prompt.md is enough to generate good output.
 
-Runner `vanilla` agents may use PubMed MCP tools if the candidate `skill.md` instructs them to do so. Do not add extra verification instructions outside the candidate skill prompt.
+Runner `vanilla` agents may use PubMed MCP tools if the candidate `prompt.md` instructs them to do so. Do not add extra verification instructions outside the candidate prompt.
 
 ### Evaluator prompt spec
 
@@ -161,10 +167,10 @@ Delegate only one benchmark task or one evaluator task to each `vanilla` subagen
 ```text
 .
 ├── README.md
-├── skill_v0.md
+├── prompt_v0.md
 ├── runs/
 │   ├── v0/
-│   │   ├── skill.md
+│   │   ├── prompt.md
 │   │   ├── summary.md
 │   │   ├── brca_epigenetic_state_ovarian_tissue/
 │   │   │   ├── output.md
@@ -173,7 +179,7 @@ Delegate only one benchmark task or one evaluator task to each `vanilla` subagen
 │   │       ├── output.md
 │   │       └── report.md
 │   ├── v1/
-│   │   ├── skill.md
+│   │   ├── prompt.md
 │   │   ├── summary.md
 │   │   └── <task_id>/
 │   │       ├── output.md
@@ -183,4 +189,3 @@ Delegate only one benchmark task or one evaluator task to each `vanilla` subagen
 │   └── tasks/
 └── rubric.md
 ```
-
