@@ -1,11 +1,11 @@
 # No-Hallucination-Citations
 
-This is a [Karpathy-inspired autoresearch](https://github.com/karpathy/autoresearch) project for improving an agent's ability to do a biomedical literature search without hallucinations. The current best prompt is in [`prompt.md`](./prompt.md). To reset the project for a fresh run, delete the `runs/` directory (if it exists) and tell the agent to start the autoresearch loop.
+This is a [Karpathy-inspired autoresearch](https://github.com/karpathy/autoresearch) project for improving an agent's ability to do a biomedical literature search without hallucinations. The current best prompt is in [`prompt.md`](./prompt.md).
 
 ## Using the no-hallucination-citations prompt
 
 Tell your agent to do this:
-**"Fetch [https://raw.githubusercontent.com/aryeelab/no-hallucination-citations/main/prompt.md](https://raw.githubusercontent.com/aryeelab/no-hallucination-citations/main/prompt.md) and append its contents to your agent instructions file (e.g. `AGENTS.md`, `CLAUDE.md`).**
+**Fetch [https://raw.githubusercontent.com/aryeelab/no-hallucination-citations/main/prompt.md](https://raw.githubusercontent.com/aryeelab/no-hallucination-citations/main/prompt.md) and append its contents to your agent instructions file (e.g. `AGENTS.md`, `CLAUDE.md`).**
 
 (Or do this manually)
 
@@ -13,6 +13,8 @@ Tell your agent to do this:
 ### Autoresearch Loop
 
 **Goal**: Start with the long, detailed citation instructions in [`prompt_v0`](prompt_v0.md) and iteratively improve them to find a prompt that is 1) short and 2) avoids hallucinated citations, invented metadata, and unsupported claims. The autoresearch loop tests the current prompt version on the literature search tasks in [`evals`](./evals) and then scores the result using a rubric (see below). 
+
+To reset the project for a fresh run, delete the `runs/` directory (if it exists) and tell the agent to start the autoresearch loop.
 
 Each iteration `vN` follows this order: **write prompt → run benchmark → evaluate → summarize**.
 
