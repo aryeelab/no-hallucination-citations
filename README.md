@@ -26,7 +26,7 @@ Each iteration `vN` follows this order: **write prompt → run benchmark → eva
 
 ### Runner prompt spec
 
-Delegate a runner task to a `vanilla` agent with this input:
+Delegate a runner task to an agent with this input:
 - The skill prompt from `runs/vN/skill.md`
 - The task prompt from the corresponding `evals/tasks/` file
 - The exact absolute output path: `.../runs/vN/<task_id>/output.md`
@@ -37,7 +37,7 @@ Runner `vanilla` agents may use PubMed MCP tools if the candidate `skill.md` ins
 
 ### Evaluator prompt spec
 
-Delegate an eval task to a `vanilla` agent with this input:
+Delegate an eval task to an agent with this input:
 - The full rubric from this README (including the "Expected Evaluator Report Format" section and severe failure penalties)
 - The `output.md` from the runner for this task
 - The original task prompt
