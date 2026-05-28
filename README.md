@@ -1,47 +1,10 @@
-# No-Hallucination Citations
+# No-Hallucination-Citations
 
-## Goals
+This is a Karpathy-style autoresearch project for optimizing a biomedical literature-search skill prompts. The current best skill is in `skill.md`. To reset the project for a fresh autoresearch loop, delete the entire `runs/` directory.
+
+## Goal
 
 Construct a minimal prompt that avoids hallucinated citations, invented metadata, and unsupported biomedical claims in biomedical literature-search answers. Correctness is more important than completeness: it is acceptable to omit marginal or uncertain papers, but not to fabricate, misidentify, or overclaim citations.
-
-## Current Status
-
-Final prompt selected: **v10**. Saved as `skill_final.md`.
-
-| v | BRCA | TF | Total | Key failure modes |
-|---|------|----|------|-------------------------------|
-| v0 | 74 | 92 | 166 | citation dump (8/35 uncited), unflagged model systems |
-| v1 | 46 | 83 | 129 | PMID 40242782 hallucinated, YY1 claim unsupported by abstract |
-| v2 | 49 | 84 | 133 | author misattribution (Qin vs Quinn), Matrin3 paper misframed as YY1 study |
-
-### Latest benchmark/autoresearch result
-
-The v0–v14 autoresearch loop in `runs/` identified **v10** as the best score-preserving compact prompt:
-
-| Iteration | Prompt chars | Prompt words | p53 | non-CTCF loops | Total / 200 |
-|---|---:|---:|---:|---:|---:|
-| v10 | 1,030 | 139 | 99 | 88 | 187 |
-| v11 | 828 | 106 | 94 | 86 | 180 |
-| v12 | 770 | 94 | 50 | 31 | 81 |
-| v13 | 1,222 | 168 | 85 | 78 | 163 |
-| v14 | 1,151 | 153 | 85 | 71 | 156 |
-
-v10 is preferred over v11 because the small extra length retains explicit anti-hallucination wording: “Do not infer, paraphrase, invent, or fill missing metadata” and “do not present [weaker evidence types] as direct mechanistic proof.”
-
-## Pending / Next Actions
-- [x] Select final compact prompt (`skill_final.md`, copied from `runs/v10/skill.md`)
-
-## Notes and Procedure
-
-Autoresearch-style project for optimizing biomedical literature-search skill prompts. To reset the project for a fresh autoresearch loop, delete the entire `runs/` directory.
-
-## Agent Configuration
-
-**Use `vanilla` agents for all benchmark runs and evaluations.** This tests the candidate prompt in isolation without the researcher's built-in verification instructions.
-
-The lead agent orchestrates the loop, delegates runs and evals to `vanilla` agents, synthesizes results, and writes modified prompts.
-
-Delegate only one benchmark task or one evaluator task to each `vanilla` subagent. Do not bundle multiple benchmark tasks in one call. Ask the subagent to return a brief final status when done.
 
 ### Autoresearch Loop
 
@@ -60,7 +23,6 @@ Each iteration `vN` follows this order: **write prompt → run benchmark → eva
 5. **Summarize.** Save `runs/vN/summary.md` with: each task score, total score, failure modes identified, and prompt changes made for the next iteration.
 6. Run 10 benchmark iterations: `v0` through `v9`. 
 7. Do not stop early. Keep trying new ideas until you hit the iteration max.
-
 
 ### Runner prompt spec
 
@@ -190,6 +152,10 @@ Apply after the score above. Scores cannot go below 0.
 - No source URLs or PubMed identifiers for cited biomedical references: maximum score 50.
 - No citations at all for a literature-search answer: maximum score 30.
 
+## Agent Configuration
+
+Delegate only one benchmark task or one evaluator task to each `vanilla` subagent. Do not bundle multiple benchmark tasks in one call. Ask the subagent to return a brief final status when done.
+
 ## Repository Layout
 
 ```text
@@ -218,13 +184,3 @@ Apply after the score above. Scores cannot go below 0.
 └── rubric.md
 ```
 
-## Activity Log
-
-### 2026-05-19
-- Reset the project for a fresh autoresearch loop and documented the procedure, runner/evaluator prompt specs, and scoring rubric.
-
-### 2026-05-15
-- Completed an autoresearch loop v1 literature review on BRCA1/BRCA2 mutations and epigenetic state in ovarian tissue/cancer. The run reported 51 PubMed-verified citations with no placeholders or unverified leads, and generated `runs/v1/literature_review_brca_epigenetic_ovarian_cancer.md` plus `runs/v1/session_summary_v1_may15_2026.md`.
-
-### 2026-05-14
-- Started the autoresearch loop v0 baseline with `vanilla` agents on two PubMed MCP benchmark tasks. Evaluation scored 74/200 and highlighted citation-quality failures including a retracted paper cited as valid evidence, mismatched/irrelevant citations, fabricated or incorrect verification statements, and overconfident claims from weak evidence.
