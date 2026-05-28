@@ -10,7 +10,7 @@ Construct a minimal prompt that avoids hallucinated citations, invented metadata
 
 Each iteration `vN` follows this order: **write prompt → run benchmark → evaluate → summarize**.
 
-1. **Write the prompt.** For `v0`, copy the seed from `./skill_v0.md` to `runs/v0/skill.md`. For `vN>0`, write a new prompt addressing the previous iteration's failure modes. Save as `runs/vN/skill.md`. Experiment freely with the new skill text, but do not explicitly put a hard cap on the number of citations to be returned. 
+1. **Write the prompt.** For `v0`, copy the seed from `./skill_v0.md` to `runs/v0/skill.md`. For `vN>0`, write a new prompt addressing the previous iteration's failure modes. Save as `runs/vN/skill.md`. Experiment freely with the new skill text to maximize the score while minimizing prompt length. Do not explicitly put a hard cap on the number of citations to be returned. 
 2. **Identify the next version.** If `runs/` doesn't exist, start at `v0`. Otherwise, find the highest version with a `skill.md` but no complete `summary.md`, or the next increment if all existing versions are complete.
 3. **Run the benchmark.** Execute every task in `evals/tasks/`. Use the task file's declared `Task ID` as `<task_id>` when present; otherwise use the file basename converted to underscores. Create `runs/vN/<task_id>/` and save runner output in `runs/vN/<task_id>/output.md`.
    - The lead must tell each runner subagent the exact absolute output path.
